@@ -1,0 +1,278 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+
+/* -------- Design tokens -------- */
+:root {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --text: #1d1d1f;
+  --muted: #6e6e73;
+  --border: #e5e5ea;
+  --border-strong: #d2d2d7;
+  --shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  --radius: 12px;
+  --radius-sm: 10px;
+  --blue: #0071e3;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* -------- Layout -------- */
+#root {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.75rem 1rem 2.5rem;
+}
+
+/* -------- Header -------- */
+/* Works with your existing <header id="header"> */
+#header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 1.75rem auto 1.25rem;
+  text-align: center;
+}
+
+#header img {
+  width: 3.5rem;
+  height: 3.5rem;
+  object-fit: contain;
+}
+
+#header h1 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  line-height: 1.2;
+}
+
+/* Optional subtitle if you add <p class="subtitle"> */
+.subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* -------- Cards / Panels -------- */
+/* Use this class anywhere you want Apple-like panels */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* -------- User input panel -------- */
+#user-input {
+  max-width: 34rem;
+  margin: 1.25rem auto;
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.input-group {
+  display: flex;
+  gap: 1rem;
+}
+
+@media (max-width: 520px) {
+  .input-group {
+    flex-direction: column;
+  }
+}
+
+/* Labels */
+#user-input label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--muted);
+}
+
+/* Inputs */
+#user-input input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+#user-input input::placeholder {
+  color: #9a9aa0;
+}
+
+#user-input input:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.18);
+}
+
+/* -------- Result table -------- */
+#result {
+  width: 100%;
+  max-width: 52rem;
+  margin: 1.5rem auto 0;
+  padding: 0.25rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+}
+
+/* Make table look like an Apple panel */
+#result thead th {
+  text-align: right;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25px;
+  color: var(--muted);
+  padding: 0.85rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+#result tbody td {
+  text-align: right;
+  font-size: 0.92rem;
+  padding: 0.85rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+#result tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.center {
+  text-align: center;
+}
+
+/* -------- HEADER (Apple-style) -------- */
+.app-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 1.5rem auto 1rem;
+}
+
+/* ✅ Make the logo properly small */
+.app-logo {
+  width: 4.8rem; /* main control for size */
+  height: 4.8rem;
+  object-fit: contain;
+}
+
+/* Title styling */
+.app-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  margin: 0;
+  color: #1d1d1f;
+}
+
+/* ---- Scrollable fixed-size container ---- */
+.input-scroll-container {
+  max-height: 420px; /* main control: make taller/shorter here */
+  overflow-y: auto; /* enables vertical scrolling */
+  padding-right: 0.4rem; /* prevents scrollbar overlap */
+}
+
+/* Optional: nicer scrollbar (Apple-like) */
+.input-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.input-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.input-scroll-container::-webkit-scrollbar-thumb {
+  background: #d2d2d7;
+  border-radius: 10px;
+}
+
+.input-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #bcbcc2;
+}
+
+/* Prevent scroll wheel from changing number inputs */
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+/* Chrome, Safari, Edge */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.predict-panel {
+  max-width: 34rem;
+  margin: 1rem auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.primary-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  font-weight: 600;
+  background: #0071e3;
+  color: white;
+  cursor: pointer;
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-text {
+  margin: 0;
+  color: #c1121f;
+  font-size: 0.95rem;
+}
+
+.result-text {
+  margin: 0;
+  font-size: 1rem;
+}
+.hint-text {
+  margin: 0;
+  color: #6e6e73;
+  font-size: 0.95rem;
+}
