@@ -14,7 +14,10 @@ app = FastAPI()
 # Allow React dev server
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://species-evaluation-web.vercel.app",
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
