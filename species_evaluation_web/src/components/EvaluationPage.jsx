@@ -20,7 +20,7 @@ export default function EvaluationPage({ userInput, onChange }) {
                 {label}
                 {en ? <span className="label-en"> — {en}</span> : null}
                 {SCALES[key] ? (
-                  <span className="label-help"> (scale)</span>
+                  <span className="label-help"></span>
                 ) : null}
               </button>
 

@@ -11,7 +11,6 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // ✅ Use env var first (Vercel), fallback for local dev
   const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
   const canPredict = useMemo(
@@ -48,7 +47,6 @@ export default function App() {
         body: JSON.stringify(payload),
       });
 
-      // ✅ More robust: handle non-JSON errors too
       const text = await res.text();
       let data = null;
       try {

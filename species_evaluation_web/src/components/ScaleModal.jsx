@@ -1,20 +1,26 @@
+import { createPortal } from "react-dom";
+
 export default function ScaleModal({ open, scale, onClose }) {
   if (!open || !scale) return null;
 
   const levels = scale.levels ?? [];
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3>{scale.title}</h3>
-          <button className="modal-close" onClick={onClose} aria-label="Close">
+          <button
+            type="button"
+            className="modal-close"
+            onClick={onClose}
+            aria-label="Close"
+          >
             ✕
           </button>
         </div>
 
         <div className="modal-body">
-
           {scale.note && <p className="scale-note">{scale.note}</p>}
 
           {levels.length > 0 ? (
@@ -34,9 +40,7 @@ export default function ScaleModal({ open, scale, onClose }) {
               ))}
             </div>
           ) : (
-            <p className="scale-empty">
-              No rating scale defined yet for this indicator.
-            </p>
+            <p className="scale-empty">No rating scale defined yet for this indicator.</p>
           )}
 
           <p className="scale-tip">
@@ -44,6 +48,7 @@ export default function ScaleModal({ open, scale, onClose }) {
           </p>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
