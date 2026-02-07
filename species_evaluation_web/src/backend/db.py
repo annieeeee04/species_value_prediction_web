@@ -5,7 +5,6 @@ import pymysql
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Always load the .env that sits next to this file
 env_path = Path(__file__).resolve().parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
@@ -17,8 +16,6 @@ if not DATABASE_URL:
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL is not set")
 
-# Railway often gives mysql://... which defaults to MySQLdb.
-# Force SQLAlchemy to use PyMySQL.
 if DATABASE_URL.startswith("mysql://"):
     DATABASE_URL = DATABASE_URL.replace("mysql://", "mysql+pymysql://", 1)
 

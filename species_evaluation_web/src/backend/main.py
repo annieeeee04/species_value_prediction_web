@@ -57,7 +57,6 @@ def health():
 def predict(req: PredictRequest):
     db = SessionLocal()
     try:
-        # Model expects S1..S20 as column names
         df = pd.DataFrame([{
             "S1": req.initialS1,
             "S2": req.initialS2,

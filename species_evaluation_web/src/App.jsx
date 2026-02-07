@@ -20,7 +20,10 @@ export default function App() {
   );
 
   function handleChange(inputIdentifier, newValue) {
-    setUserInput((prev) => ({ ...prev, [inputIdentifier]: newValue }));
+    setUserInput((prev) => ({
+      ...prev,
+      [inputIdentifier]: newValue === "" ? 6 : Number(newValue),
+    }));
     setPrediction(null);
     setError("");
   }
@@ -85,8 +88,10 @@ export default function App() {
           {loading ? "Predicting..." : "Predict"}
         </button>
 
-        {!canPredict && !loading && (
-          <p className="hint-text">Fill in all S1–S20 to enable prediction.</p>
+        {!loading && (
+          <p className="hint-text">
+            Leave any field blank to use the default value (6).
+          </p>
         )}
 
         {error && <p className="error-text">{error}</p>}
