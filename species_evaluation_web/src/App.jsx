@@ -12,9 +12,15 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // ✅ Use env var first (Vercel), fallback for local dev
+  const API_BASE =
+    import.meta.env.VITE_API_BASE || "http://localhost:8000";
+
   const canPredict = useMemo(
     () =>
-      Object.values(userInput).every((v) => v !== "" && !Number.isNaN(Number(v))),
+      Object.values(userInput).every(
+        (v) => v !== "" && !Number.isNaN(Number(v))
+      ),
     [userInput]
   );
 
@@ -38,13 +44,20 @@ export default function App() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://127.0.0.1:8000/predict", {
+      const res = await fetch(`${API_BASE}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json().catch(() => null);
+      // ✅ More robust: handle non-JSON errors too
+      const text = await res.text();
+      let data = null;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = null;
+      }
 
       if (!res.ok) {
         const msg =
@@ -52,13 +65,13 @@ export default function App() {
             ? typeof data.detail === "string"
               ? data.detail
               : JSON.stringify(data.detail)
-            : "API error";
+            : text || "API error";
         throw new Error(msg);
       }
 
       setPrediction(data.prediction);
     } catch (e) {
-      setError(e.message || "Prediction failed.");
+      setError(e?.message || "Prediction failed.");
     } finally {
       setLoading(false);
     }
