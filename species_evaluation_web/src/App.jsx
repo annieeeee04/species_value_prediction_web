@@ -3,8 +3,9 @@ import Header from "./components/Header";
 import EvaluationPage from "./components/EvaluationPage";
 
 const INITIAL_INPUTS = Object.fromEntries(
-  Array.from({ length: 20 }, (_, i) => [`initialS${i + 1}`, ""])
-);
+    FIELDS.map(({ key }) => [key, ""])
+  );
+  
 
 export default function App() {
   const [userInput, setUserInput] = useState(INITIAL_INPUTS);
