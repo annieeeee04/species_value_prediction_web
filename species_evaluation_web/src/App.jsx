@@ -3,9 +3,7 @@ import Header from "./components/Header";
 import EvaluationPage from "./components/EvaluationPage";
 import { FIELDS } from "./constants/fields";
 
-const INITIAL_INPUTS = Object.fromEntries(
-    FIELDS.map(({ key }) => [key, ""])
-  );  
+const INITIAL_INPUTS = Object.fromEntries(FIELDS.map(({ key }) => [key, 6]));
 
 export default function App() {
   const [userInput, setUserInput] = useState(INITIAL_INPUTS);
@@ -14,14 +12,10 @@ export default function App() {
   const [error, setError] = useState("");
 
   // ✅ Use env var first (Vercel), fallback for local dev
-  const API_BASE =
-    import.meta.env.VITE_API_BASE || "http://localhost:8000";
+  const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
   const canPredict = useMemo(
-    () =>
-      Object.values(userInput).every(
-        (v) => v !== "" && !Number.isNaN(Number(v))
-      ),
+    () => Object.values(userInput).every((v) => !Number.isNaN(Number(v))),
     [userInput]
   );
 
@@ -37,7 +31,7 @@ export default function App() {
     const payload = {};
     for (const [k, v] of Object.entries(userInput)) {
       if (v === "" || Number.isNaN(Number(v))) {
-        setError(`Please enter a valid number for ${k.replace("initial", "")}`);
+        setError(`Please enter a valid number for this field.`);
         return;
       }
       payload[k] = Number(v);
@@ -61,12 +55,11 @@ export default function App() {
       }
 
       if (!res.ok) {
-        const msg =
-          data?.detail
-            ? typeof data.detail === "string"
-              ? data.detail
-              : JSON.stringify(data.detail)
-            : text || "API error";
+        const msg = data?.detail
+          ? typeof data.detail === "string"
+            ? data.detail
+            : JSON.stringify(data.detail)
+          : text || "API error";
         throw new Error(msg);
       }
 
