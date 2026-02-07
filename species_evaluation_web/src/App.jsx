@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import Header from "./components/Header";
 import EvaluationPage from "./components/EvaluationPage";
+import { FIELDS } from "./constants/fields";
 
 const INITIAL_INPUTS = Object.fromEntries(
     FIELDS.map(({ key }) => [key, ""])
-  );
-  
+  );  
 
 export default function App() {
   const [userInput, setUserInput] = useState(INITIAL_INPUTS);

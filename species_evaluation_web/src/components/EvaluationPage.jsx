@@ -1,28 +1,6 @@
-const FIELDS = [
-    { key: "envAesthetic", label: "S1 环境美化价值", en: "Environmental Aesthetic Value" },
-    { key: "psychoEdu", label: "S2 心理与教育价值", en: "Psychological and Educational Value" },
-    { key: "marketGrowth", label: "S3 市场增长潜力", en: "Market Growth Potential" },
-    { key: "marketCompetitiveness", label: "S4 市场竞争力", en: "Market Competitiveness" },
-    { key: "varietalChar", label: "S5 品种特性", en: "Varietal (Cultivar) Characteristics" },
-    { key: "economicLifespan", label: "S6 经济寿命", en: "Economic Lifespan" },
-    { key: "adaptability", label: "S7 适应能力", en: "Adaptability" },
-    { key: "prodTechMaturity", label: "S8 生产技术成熟度", en: "Maturity of Production Technology" },
-    { key: "breedingBarrier", label: "S9 育种技术进入难度", en: "Barriers to Entry in Breeding Technology" },
-    { key: "prodBarrier", label: "S10 生产技术进入难度", en: "Barriers to Entry in Production Technology" },
-    { key: "rdCost", label: "S11 研发成本", en: "R&D Cost" },
-    { key: "symbolicMeaning", label: "S12 花卉象征意义", en: "Symbolic/Cultural Meaning of the Flower" },
-    { key: "marketingChannels", label: "S13 营销渠道", en: "Marketing Channels" },
-    { key: "transactionModel", label: "S14 转化交易方式", en: "Commercialization / Transaction Model" },
-    { key: "transportReq", label: "S15 运输要求", en: "Transportation Requirements" },
-    { key: "storageReq", label: "S16 仓储要求", en: "Storage Requirements" },
-    { key: "policyProtection", label: "S17 保护政策完善性", en: "Completeness of Protection Policies" },
-    { key: "publicAwareness", label: "S18 公众认知程度", en: "Level of Public Awareness" },
-    { key: "regulatoryIntensity", label: "S19 监管检查力度", en: "Regulatory Supervision Intensity" },
-    { key: "penaltyStrength", label: "S20 惩处力度", en: "Enforcement / Penalty Strength" }
-  ];
-  
+import { FIELDS } from "../constants/fields";
 
-  export default function EvaluationPage({ userInput, onChange }) {
+export default function EvaluationPage({ userInput, onChange }) {
     return (
       <section id="user-input">
         <div className="input-scroll-container">
