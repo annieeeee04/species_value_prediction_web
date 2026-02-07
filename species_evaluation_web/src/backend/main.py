@@ -1,11 +1,14 @@
-from fastapi import FastAPI
+import os
+import joblib
 import pandas as pd
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import joblib
-import numpy as np
-import os
 
+from db import SessionLocal, engine, Base
+from models import PredictionRecord
+
+Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 # Allow React dev server
@@ -49,6 +52,7 @@ def health():
 
 @app.post("/predict")
 def predict(req: PredictRequest):
+    db = SessionLocal()
     try:
         # Model expects S1..S20 as column names
         df = pd.DataFrame([{
@@ -74,8 +78,23 @@ def predict(req: PredictRequest):
             "S20": req.initialS20,
         }])
 
-        pred = model.predict(df)[0]
-        return {"prediction": float(pred)}
+        pred = float(model.predict(df)[0])
+
+        # Save to DB
+        record = PredictionRecord(
+            S1=req.initialS1,  S2=req.initialS2,  S3=req.initialS3,  S4=req.initialS4,  S5=req.initialS5,
+            S6=req.initialS6,  S7=req.initialS7,  S8=req.initialS8,  S9=req.initialS9,  S10=req.initialS10,
+            S11=req.initialS11, S12=req.initialS12, S13=req.initialS13, S14=req.initialS14, S15=req.initialS15,
+            S16=req.initialS16, S17=req.initialS17, S18=req.initialS18, S19=req.initialS19, S20=req.initialS20,
+            prediction=pred
+        )
+        db.add(record)
+        db.commit()
+
+        return {"prediction": pred, "saved": True}
 
     except Exception as e:
+        db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
