@@ -26,6 +26,7 @@ BASE_DIR = os.path.dirname(__file__)
 MODEL_PATH = os.path.join(BASE_DIR, "model.joblib")
 model = joblib.load(MODEL_PATH)
 
+
 class PredictRequest(BaseModel):
     initialS1: float
     initialS2: float
@@ -55,6 +56,7 @@ def health():
 
 @app.post("/predict")
 def predict(req: PredictRequest):
+    
     db = SessionLocal()
     try:
         df = pd.DataFrame([{

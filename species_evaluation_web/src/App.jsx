@@ -51,6 +51,9 @@ export default function App() {
 
     setLoading(true);
     try {
+      console.log("API_BASE:", API_BASE);
+      console.log("payload:", payload);
+
       const res = await fetch(`${API_BASE}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
