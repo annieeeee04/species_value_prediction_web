@@ -51,7 +51,7 @@ This tool helps **plant breeders, growers, researchers, and students** evaluate 
 
 ### Understanding Features
 
-Each feature (S1–S20) represents a specific plant characteristic. Click the field labels in the app to see detailed descriptions and value scales.
+Each feature (S1–S20) represents a specific species characteristic. Click the field labels in the app to see detailed descriptions and value scales.
 
 ---
 
