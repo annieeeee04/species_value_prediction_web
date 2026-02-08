@@ -24,7 +24,8 @@ export default function EvaluationPage({ userInput, onChange }) {
 
               <input
                 type="number"
-                value={userInput[key].touched ? userInput[key].value : ""}
+                value={userInput[key].value}
+                placeholder="6"
                 onChange={(e) => onChange(key, e.target.value)}
                 onWheel={(e) => e.currentTarget.blur()}
               />
