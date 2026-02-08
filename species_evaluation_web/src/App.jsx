@@ -12,6 +12,7 @@ export default function App() {
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const[saved, setSaved] = useState(false);
 
   const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
@@ -31,6 +32,7 @@ export default function App() {
       },
     }));
     setPrediction(null);
+    setSaved(false);
     setError("");
   }
 
@@ -39,9 +41,8 @@ export default function App() {
 
     const payload = {};
 
-    for (const [k, obj] of Object.entries(userInput)) {
-      const raw = obj.value;
-      const finalVal = raw === "" ? 6 : Number(raw);
+    for (const [k, {value}] of Object.entries(userInput)) {
+      const finalVal = value === "" ? 6 : Number(value);
 
       if (Number.isNaN(finalVal)) {
         setError("Please enter a valid number for this field.");
@@ -80,6 +81,7 @@ export default function App() {
       }
 
       setPrediction(data.prediction);
+      setSaved(data.saved);
     } catch (e) {
       setError(e?.message || "Prediction failed.");
     } finally {
@@ -112,6 +114,7 @@ export default function App() {
         {prediction !== null && (
           <p className="result-text">
             Prediction: <strong>{Number(prediction).toFixed(3)}</strong>
+            {saved && <span className="saved-badge"> ✔️ saved</span>}
           </p>
         )}
       </div>

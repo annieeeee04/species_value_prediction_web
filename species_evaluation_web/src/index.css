@@ -354,6 +354,19 @@ input[type="number"]::-webkit-inner-spin-button {
   font-size: 1rem;
 }
 
+.saved-badge {
+    margin-left: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #0f766e;            /* teal-700 */
+    background-color: #ecfeff; /* cyan-50 */
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid #67e8f9; /* cyan-300 */
+    display: inline-flex;
+    align-items: center;
+  }
+  
 /* =========================
    Modal (glass sheet style)
    ========================= */
