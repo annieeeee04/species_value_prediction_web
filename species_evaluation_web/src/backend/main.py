@@ -23,7 +23,7 @@ app.add_middleware(
 )
 
 BASE_DIR = os.path.dirname(__file__)
-MODEL_PATH = os.path.join(BASE_DIR, "model.joblib")
+MODEL_PATH = os.path.join(BASE_DIR, "rf_model.joblib")
 model = joblib.load(MODEL_PATH)
 
 
