@@ -1,5 +1,5 @@
 export const SCALES = {
-  envAesthetic: {
+    initialS1: {
     title: "S1 环境美化价值 — Environmental Aesthetic Value",
     levels: [
       {
@@ -20,7 +20,7 @@ export const SCALES = {
     ],
   },
 
-  psychoEdu: {
+  initialS2: {
     title: "S2 心理与教育价值 — Psychological and Educational Value",
     levels: [
       {
@@ -41,7 +41,7 @@ export const SCALES = {
     ],
   },
 
-  marketGrowth: {
+  initialS3: {
     title: "S3 市场增长潜力 — Market Growth Potential",
     levels: [
       {
@@ -61,7 +61,7 @@ export const SCALES = {
       },
     ],
   },
-  marketCompetitiveness: {
+  initialS4: {
     title: "S4 市场竞争力 — Market Competitiveness",
     levels: [
       {
@@ -91,7 +91,7 @@ export const SCALES = {
       },
     ],
   },
-  varietalChar: {
+  initialS5: {
     title: "S5 品种特性 — Varietal (Cultivar) Characteristics",
 
     levels: [
@@ -136,14 +136,14 @@ export const SCALES = {
       },
     ],
   },
-  economicLifespan: {
+  initialS6: {
     title: "S6 经济寿命 - Economic Lifespan",
     note: "Quantified using the years-based method (年限法).",
     levels: [
       /* ... */
     ],
   },
-  adaptability: {
+  initialS7: {
     title: "S7 适应能力 — Adaptability",
     levels: [
       {
@@ -174,7 +174,7 @@ export const SCALES = {
     ],
   },
 
-  prodTechMaturity: {
+  initialS8: {
     title: "S8 生产技术成熟度 — Maturity of Production Technology",
     note: "Quantified using an assignment-based method (赋值法).",
     levels: [
@@ -182,7 +182,7 @@ export const SCALES = {
     ],
   },
 
-  breedingBarrier: {
+  initialS9: {
     title: "S9 育种技术进入难度 — Barriers to Entry in Breeding Technology",
     levels: [
       {
@@ -203,7 +203,7 @@ export const SCALES = {
     ],
   },
 
-  prodBarrier: {
+  initialS10: {
     title: "S10 生产技术进入难度 — Barriers to Entry in Production Technology",
     levels: [
       {
@@ -224,13 +224,13 @@ export const SCALES = {
     ],
   },
 
-  rdCost: {
+  initialS11: {
     title: "S11 研发成本 — R&D Cost",
     note: "Quantified using an assignment-based method (赋值法).",
     levels: [],
   },
 
-  symbolicMeaning: {
+  initialS12: {
     title: "S12 花卉象征意义 — Symbolic/Cultural Meaning of the Flower",
     levels: [
       {
@@ -251,19 +251,19 @@ export const SCALES = {
     ],
   },
 
-  marketingChannels: {
+  initialS13: {
     title: "S13 营销渠道 — Marketing Channels",
     note: "Quantified using an assignment-based method (赋值法).",
     levels: [],
   },
 
-  transactionModel: {
+  initialS14: {
     title: "S14 转化交易方式 — Commercialization / Transaction Model",
     note: "Quantified using an assignment-based method (赋值法).",
     levels: [],
   },
 
-  transportReq: {
+  initialS15: {
     title: "S15 运输要求 — Transportation Requirements",
     levels: [
       {
@@ -284,7 +284,7 @@ export const SCALES = {
     ],
   },
 
-  storageReq: {
+  initialS16: {
     title: "S16 仓储要求 — Storage Requirements",
     levels: [
       {
@@ -305,7 +305,7 @@ export const SCALES = {
     ],
   },
 
-  policyProtection: {
+  initialS17: {
     title: "S17 保护政策完善性 — Protection Policy Completeness",
     levels: [
       {
@@ -336,7 +336,7 @@ export const SCALES = {
     ],
   },
 
-  publicAwareness: {
+  initialS18: {
     title: "S18 公众认知程度 — Public Awareness Level",
     levels: [
       {
@@ -366,7 +366,7 @@ export const SCALES = {
       },
     ],
   },
-  regulatoryIntensity: {
+  initialS19: {
     title: "S19 监管检查力度 — Regulatory Supervision Intensity",
     levels: [
       {
@@ -396,7 +396,7 @@ export const SCALES = {
       },
     ],
   },
-  penaltyStrength: {
+  initialS20: {
     title: "S20 惩处力度 — Enforcement / Penalty Strength",
     levels: [
       {

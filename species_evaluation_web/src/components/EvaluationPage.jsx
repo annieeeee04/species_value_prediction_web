@@ -19,14 +19,12 @@ export default function EvaluationPage({ userInput, onChange }) {
               >
                 {label}
                 {en ? <span className="label-en"> — {en}</span> : null}
-                {SCALES[key] ? (
-                  <span className="label-help"></span>
-                ) : null}
+                {SCALES[key] ? <span className="label-help"></span> : null}
               </button>
 
               <input
                 type="number"
-                value={userInput[key] === 6 ? "" : userInput[key]}
+                value={userInput[key].touched ? userInput[key].value : ""}
                 onChange={(e) => onChange(key, e.target.value)}
                 onWheel={(e) => e.target.blur()}
               />

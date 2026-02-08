@@ -3,7 +3,9 @@ import Header from "./components/Header";
 import EvaluationPage from "./components/EvaluationPage";
 import { FIELDS } from "./constants/fields";
 
-const INITIAL_INPUTS = Object.fromEntries(FIELDS.map(({ key }) => [key, 6]));
+const INITIAL_INPUTS = Object.fromEntries(
+  FIELDS.map(({ key }) => [key, { value: 6, touched: false }])
+);
 
 export default function App() {
   const [userInput, setUserInput] = useState(INITIAL_INPUTS);
@@ -14,14 +16,17 @@ export default function App() {
   const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
   const canPredict = useMemo(
-    () => Object.values(userInput).every((v) => !Number.isNaN(Number(v))),
+    () => Object.values(userInput).every((x) => !Number.isNaN(Number(x.value))),
     [userInput]
   );
 
   function handleChange(inputIdentifier, newValue) {
     setUserInput((prev) => ({
       ...prev,
-      [inputIdentifier]: newValue === "" ? 6 : Number(newValue),
+      [inputIdentifier]: {
+        value: newValue === "" ? 6 : Number(newValue),
+        touched: true,
+      },
     }));
     setPrediction(null);
     setError("");
@@ -31,12 +36,17 @@ export default function App() {
     setError("");
 
     const payload = {};
-    for (const [k, v] of Object.entries(userInput)) {
-      if (v === "" || Number.isNaN(Number(v))) {
-        setError(`Please enter a valid number for this field.`);
+
+    for (const [k, obj] of Object.entries(userInput)) {
+      const val = obj.value;
+
+      // If you truly allow blank, check val === "" here (but your state currently converts "" -> 6)
+      if (val === "" || Number.isNaN(Number(val))) {
+        setError("Please enter a valid number for this field.");
         return;
       }
-      payload[k] = Number(v);
+
+      payload[k] = Number(val);
     }
 
     setLoading(true);
