@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import Header from "./components/Header";
 import EvaluationPage from "./components/EvaluationPage";
+import ImageAnalysis from "./components/ImageAnalysis";
 import { FIELDS } from "./constants/fields";
 
 const INITIAL_INPUTS = Object.fromEntries(
@@ -12,7 +13,10 @@ export default function App() {
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const[saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  // Track which fields were filled by AI
+  const [aiFilledKeys, setAiFilledKeys] = useState(new Set());
 
   const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
@@ -31,6 +35,30 @@ export default function App() {
         touched: true,
       },
     }));
+    // If user manually edits an AI-filled field, remove the AI marker
+    setAiFilledKeys((prev) => {
+      if (prev.has(inputIdentifier)) {
+        const next = new Set(prev);
+        next.delete(inputIdentifier);
+        return next;
+      }
+      return prev;
+    });
+    setPrediction(null);
+    setSaved(false);
+    setError("");
+  }
+
+  // Called by ImageAnalysis component with { initialS1: "7", initialS2: "5", ... }
+  function handleAiScores(scores) {
+    setUserInput((prev) => {
+      const next = { ...prev };
+      for (const [key, strVal] of Object.entries(scores)) {
+        next[key] = { value: strVal, touched: true };
+      }
+      return next;
+    });
+    setAiFilledKeys(new Set(Object.keys(scores)));
     setPrediction(null);
     setSaved(false);
     setError("");
@@ -41,11 +69,11 @@ export default function App() {
 
     const payload = {};
 
-    for (const [k, {value}] of Object.entries(userInput)) {
+    for (const [k, { value }] of Object.entries(userInput)) {
       const finalVal = value === "" ? 6 : Number(value);
 
       if (Number.isNaN(finalVal)) {
-        setError("Please enter a valid number for this field.");
+        setError("请输入合法数字。");
         return;
       }
 
@@ -54,9 +82,6 @@ export default function App() {
 
     setLoading(true);
     try {
-      console.log("API_BASE:", API_BASE);
-      console.log("payload:", payload);
-
       const res = await fetch(`${API_BASE}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -92,7 +117,18 @@ export default function App() {
   return (
     <div>
       <Header />
-      <EvaluationPage userInput={userInput} onChange={handleChange} />
+
+      {/* Multimodal image analysis section */}
+      <ImageAnalysis
+        onScoresApplied={handleAiScores}
+        apiBase={API_BASE}
+      />
+
+      <EvaluationPage
+        userInput={userInput}
+        onChange={handleChange}
+        aiFilledKeys={aiFilledKeys}
+      />
 
       <div className="predict-panel">
         <button
