@@ -47,18 +47,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Apple-ish background */
-  background: radial-gradient(
-      1200px 600px at 20% 0%,
-      rgba(0, 113, 227, 0.1),
-      transparent 60%
-    ),
-    radial-gradient(
-      900px 500px at 80% 10%,
-      rgba(0, 0, 0, 0.06),
-      transparent 55%
-    ),
-    var(--bg);
+  background: var(--bg);
 }
 
 #root {
