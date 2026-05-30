@@ -154,18 +154,20 @@ def run_agent(req: AgentSearchRequest, api_key: str) -> dict:
     MAX_ROUNDS = 15
 
     for round_num in range(MAX_ROUNDS):
-        # If search cap reached, tell Claude to stop searching and output results
+        # If search cap reached, omit tools entirely so Claude must output JSON
         search_limit_reached = len(search_queries) >= MAX_SEARCHES
-        active_tools = [] if search_limit_reached else TOOLS
 
-        response = client.messages.create(
+        create_kwargs = dict(
             model="claude-opus-4-6",
             max_tokens=4096,
             system=system,
-            tools=active_tools if active_tools else None,
-            tool_choice={"type": "none"} if search_limit_reached else {"type": "auto"},
             messages=messages,
         )
+        if not search_limit_reached:
+            create_kwargs["tools"] = TOOLS
+            create_kwargs["tool_choice"] = {"type": "auto"}
+
+        response = client.messages.create(**create_kwargs)
 
         messages.append({"role": "assistant", "content": response.content})
 
