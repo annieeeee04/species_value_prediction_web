@@ -172,16 +172,17 @@ def run_agent(req: AgentSearchRequest, api_key: str) -> dict:
         messages.append({"role": "assistant", "content": response.content})
 
         if response.stop_reason == "end_turn":
-            final_text = ""
-            for block in response.content:
-                if hasattr(block, "text"):
-                    final_text = block.text
-                    break
-            return {
-                "final_text": final_text,
-                "search_queries": search_queries,
-                "search_results_log": search_results_log,
-            }
+            # Concatenate ALL text blocks (Claude sometimes splits across blocks)
+            final_text = "\n".join(
+                block.text for block in response.content if hasattr(block, "text")
+            ).strip()
+            if final_text:
+                return {
+                    "final_text": final_text,
+                    "search_queries": search_queries,
+                    "search_results_log": search_results_log,
+                }
+            # Empty response — fall through to force a scoring call below
 
         if response.stop_reason == "tool_use":
             tool_results = []
@@ -222,11 +223,11 @@ def run_agent(req: AgentSearchRequest, api_key: str) -> dict:
         system=system,
         messages=messages,
     )
-    final_text = ""
-    for block in response.content:
-        if hasattr(block, "text"):
-            final_text = block.text
-            break
+    final_text = "\n".join(
+        block.text for block in response.content if hasattr(block, "text")
+    ).strip()
+    if not final_text:
+        raise ValueError("Agent returned no scoreable content after all retries.")
     return {
         "final_text": final_text,
         "search_queries": search_queries,
@@ -249,13 +250,18 @@ async def agent_search(req: AgentSearchRequest):
         agent_result = run_agent(req, api_key)
         final_text = agent_result["final_text"]
 
-        # Strip markdown fences if present
+        # Extract JSON — handle markdown fences or JSON embedded in prose
         raw = final_text.strip()
-        if raw.startswith("```"):
+        if "```" in raw:
             raw = raw.split("```")[1]
             if raw.startswith("json"):
                 raw = raw[4:]
             raw = raw.strip()
+        # Find the outermost {...} if Claude added surrounding text
+        start = raw.find("{")
+        end = raw.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            raw = raw[start:end + 1]
 
         parsed = json.loads(raw)
         scores_raw = parsed["scores"]
