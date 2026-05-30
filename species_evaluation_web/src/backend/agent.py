@@ -1,5 +1,6 @@
 """
 Agent layer: search the web for species information, then score S1-S20 using Claude tool_use.
+User-supplied context (market, production, cultural, regulatory) takes priority over web search.
 """
 import os
 import json
@@ -7,6 +8,7 @@ import joblib
 import pandas as pd
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from typing import Optional
 import anthropic
 
 BASE_DIR = os.path.dirname(__file__)
@@ -20,6 +22,10 @@ router = APIRouter()
 
 class AgentSearchRequest(BaseModel):
     species_name: str
+    context_market: Optional[str] = ""       # S3 S4 S6 S13 S14
+    context_production: Optional[str] = ""   # S8 S9 S10 S11
+    context_cultural: Optional[str] = ""     # S2 S12
+    context_regulatory: Optional[str] = ""   # S17 S18 S19 S20
 
 
 # ─── Tool definitions for Claude ─────────────────────────────────────────────
@@ -31,7 +37,8 @@ TOOLS = [
             "Search the web for information about a plant species. "
             "Use this to find market data, horticultural characteristics, "
             "cultural significance, production requirements, and protection policies. "
-            "Run multiple targeted queries to gather comprehensive information."
+            "Run multiple targeted queries to gather comprehensive information. "
+            "Focus searches on dimensions where user context is missing or thin."
         ),
         "input_schema": {
             "type": "object",
@@ -66,70 +73,103 @@ def _do_web_search(query: str) -> str:
         return f"Search error: {str(e)}"
 
 
-SCORING_PROMPT = """你是一位观赏植物品种评估专家。你已经通过网络搜索收集了关于该植物品种的信息。
-现在请基于这些信息，为以下20个维度评分（1-10分）：
-
-S1 环境美化价值, S2 心理与教育价值, S3 市场增长潜力, S4 市场竞争力,
-S5 品种特性, S6 经济寿命, S7 适应能力, S8 生产技术成熟度,
-S9 育种技术进入难度, S10 生产技术进入难度, S11 研发成本,
-S12 花卉象征意义, S13 营销渠道, S14 转化交易方式,
-S15 运输要求（分高=要求低=耐运输）, S16 仓储要求（分高=要求低=耐存储）,
-S17 保护政策完善性, S18 公众认知程度, S19 监管检查力度, S20 惩处力度
-
-只返回如下JSON，不要任何其他文字：
-{
-  "scores": {
-    "S1": <1-10>, "S2": <1-10>, "S3": <1-10>, "S4": <1-10>, "S5": <1-10>,
-    "S6": <1-10>, "S7": <1-10>, "S8": <1-10>, "S9": <1-10>, "S10": <1-10>,
-    "S11": <1-10>, "S12": <1-10>, "S13": <1-10>, "S14": <1-10>, "S15": <1-10>,
-    "S16": <1-10>, "S17": <1-10>, "S18": <1-10>, "S19": <1-10>, "S20": <1-10>
-  },
-  "summary": "<2-3句话总结搜索到的关键信息>",
-  "sources": ["<url1>", "<url2>"]
-}"""
+def _build_context_block(req: AgentSearchRequest) -> str:
+    """Build a formatted block of user-provided context to inject into the prompt."""
+    parts = []
+    if req.context_market and req.context_market.strip():
+        parts.append(
+            f"【市场与商业信息（用户提供，对应 S3/S4/S6/S13/S14）】\n{req.context_market.strip()}"
+        )
+    if req.context_production and req.context_production.strip():
+        parts.append(
+            f"【生产与育种信息（用户提供，对应 S8/S9/S10/S11）】\n{req.context_production.strip()}"
+        )
+    if req.context_cultural and req.context_cultural.strip():
+        parts.append(
+            f"【文化与象征信息（用户提供，对应 S2/S12）】\n{req.context_cultural.strip()}"
+        )
+    if req.context_regulatory and req.context_regulatory.strip():
+        parts.append(
+            f"【法规与知识产权信息（用户提供，对应 S17/S18/S19/S20）】\n{req.context_regulatory.strip()}"
+        )
+    return "\n\n".join(parts)
 
 
 # ─── Agentic loop ─────────────────────────────────────────────────────────────
 
-def run_agent(species_name: str, api_key: str) -> dict:
+def run_agent(req: AgentSearchRequest, api_key: str) -> dict:
     client = anthropic.Anthropic(api_key=api_key)
+
+    context_block = _build_context_block(req)
+    has_user_context = bool(context_block)
+
+    # Tell Claude which dimensions already have user-supplied data so it
+    # prioritises web searches on the dimensions that are still uncovered.
+    covered_dims = []
+    if req.context_market and req.context_market.strip():
+        covered_dims += ["S3", "S4", "S6", "S13", "S14"]
+    if req.context_production and req.context_production.strip():
+        covered_dims += ["S8", "S9", "S10", "S11"]
+    if req.context_cultural and req.context_cultural.strip():
+        covered_dims += ["S2", "S12"]
+    if req.context_regulatory and req.context_regulatory.strip():
+        covered_dims += ["S17", "S18", "S19", "S20"]
+
+    uncovered_note = ""
+    if covered_dims:
+        all_dims = {f"S{i}" for i in range(1, 21)}
+        uncovered = sorted(all_dims - set(covered_dims), key=lambda x: int(x[1:]))
+        uncovered_note = (
+            f"\n用户已提供以下维度的背景信息：{', '.join(covered_dims)}。"
+            f"\n请重点通过搜索补充以下维度的信息：{', '.join(uncovered)}。"
+            "\n对于用户已提供的维度，优先采用用户信息评分，搜索可作为补充验证。"
+        )
 
     system = (
         "你是一位观赏植物品种价值评估专家。你的任务是：\n"
-        "1. 使用 web_search 工具搜索该植物品种的市场、生态、文化和生产信息（至少搜索3-5次，涵盖不同方面）\n"
-        "2. 综合所有搜索结果，为20个维度评分\n"
-        "3. 搜索应包括：市场价格/需求、生产技术、文化意义、适应性/分布范围、品种保护政策等\n"
-        "4. 完成搜索后，输出最终的JSON评分结果"
+        "1. 阅读用户提供的背景信息（如有）\n"
+        "2. 使用 web_search 工具搜索该植物品种的信息，重点补充用户未覆盖的维度\n"
+        "   ⚠️ 搜索次数限制：最多进行 4 次搜索，每次查询尽量覆盖多个维度\n"
+        "3. 综合用户信息和搜索结果，为全部20个维度评分\n"
+        "4. 用户提供的信息优先级高于网络搜索结果\n"
+        "5. 完成搜索后立即输出JSON评分结果，不要继续搜索"
+        + uncovered_note
     )
 
-    messages = [
-        {
-            "role": "user",
-            "content": (
-                f"请搜索并评估植物品种：**{species_name}**\n\n"
-                "请先进行多次搜索收集全面信息，然后给出20个维度的评分和总结。"
-            )
-        }
-    ]
+    user_message = f"请评估植物品种：**{req.species_name}**\n\n"
+    if has_user_context:
+        user_message += (
+            "以下是用户提供的背景信息，请优先参考：\n\n"
+            + context_block
+            + "\n\n请在此基础上进行最多4次网络搜索补充缺失维度的信息，然后立即给出20个维度的评分。"
+        )
+    else:
+        user_message += "请进行最多4次搜索收集关键信息，然后立即给出20个维度的评分和总结。"
+
+    messages = [{"role": "user", "content": user_message}]
 
     search_queries = []
     search_results_log = []
+    MAX_SEARCHES = 4
+    MAX_ROUNDS = 15
 
-    # Agentic loop — max 10 rounds to prevent runaway
-    for _ in range(10):
+    for round_num in range(MAX_ROUNDS):
+        # If search cap reached, tell Claude to stop searching and output results
+        search_limit_reached = len(search_queries) >= MAX_SEARCHES
+        active_tools = [] if search_limit_reached else TOOLS
+
         response = client.messages.create(
             model="claude-opus-4-6",
             max_tokens=4096,
             system=system,
-            tools=TOOLS,
+            tools=active_tools if active_tools else None,
+            tool_choice={"type": "none"} if search_limit_reached else {"type": "auto"},
             messages=messages,
         )
 
-        # Collect assistant message
         messages.append({"role": "assistant", "content": response.content})
 
         if response.stop_reason == "end_turn":
-            # Extract final text
             final_text = ""
             for block in response.content:
                 if hasattr(block, "text"):
@@ -155,13 +195,41 @@ def run_agent(species_name: str, api_key: str) -> dict:
                         "content": result,
                     })
 
+            # If cap just hit, append results then inject a nudge to finish
             messages.append({"role": "user", "content": tool_results})
+            if len(search_queries) >= MAX_SEARCHES:
+                messages.append({
+                    "role": "user",
+                    "content": "搜索已完成。请现在立即输出最终的JSON评分结果，不要再搜索。"
+                })
             continue
 
-        # Unexpected stop reason
         break
 
-    raise ValueError("Agent did not complete within the allowed rounds.")
+    # Hard fallback: force a final scoring pass with whatever info was gathered
+    messages.append({
+        "role": "user",
+        "content": (
+            "请立即基于已有信息输出最终JSON评分结果。"
+            "不要再搜索，直接给出所有20个维度的分数。"
+        )
+    })
+    response = client.messages.create(
+        model="claude-opus-4-6",
+        max_tokens=4096,
+        system=system,
+        messages=messages,
+    )
+    final_text = ""
+    for block in response.content:
+        if hasattr(block, "text"):
+            final_text = block.text
+            break
+    return {
+        "final_text": final_text,
+        "search_queries": search_queries,
+        "search_results_log": search_results_log,
+    }
 
 
 # ─── Endpoint ─────────────────────────────────────────────────────────────────
@@ -176,10 +244,10 @@ async def agent_search(req: AgentSearchRequest):
         raise HTTPException(status_code=400, detail="请提供物种名称")
 
     try:
-        agent_result = run_agent(req.species_name.strip(), api_key)
+        agent_result = run_agent(req, api_key)
         final_text = agent_result["final_text"]
 
-        # Parse JSON from final text
+        # Strip markdown fences if present
         raw = final_text.strip()
         if raw.startswith("```"):
             raw = raw.split("```")[1]

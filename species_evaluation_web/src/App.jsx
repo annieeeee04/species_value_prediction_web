@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import EvaluationPage from "./components/EvaluationPage";
 import ImageAnalysis from "./components/ImageAnalysis";
 import AgentSearch from "./components/AgentSearch";
+import ContextInput from "./components/ContextInput";
 import { FIELDS } from "./constants/fields";
 
 const INITIAL_INPUTS = Object.fromEntries(
@@ -18,6 +19,18 @@ export default function App() {
 
   // Track which fields were filled by AI
   const [aiFilledKeys, setAiFilledKeys] = useState(new Set());
+
+  // Background context for agent search
+  const [context, setContext] = useState({
+    market: "",
+    production: "",
+    cultural: "",
+    regulatory: "",
+  });
+
+  function handleContextChange(key, value) {
+    setContext((prev) => ({ ...prev, [key]: value }));
+  }
 
   const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
@@ -119,10 +132,14 @@ export default function App() {
     <div>
       <Header />
 
+      {/* Background context inputs */}
+      <ContextInput context={context} onChange={handleContextChange} />
+
       {/* Agent online search section */}
       <AgentSearch
         onScoresApplied={handleAiScores}
         apiBase={API_BASE}
+        context={context}
       />
 
       {/* Multimodal image analysis section */}

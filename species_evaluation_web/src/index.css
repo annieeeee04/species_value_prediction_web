@@ -957,3 +957,128 @@ input[type="number"]::-webkit-inner-spin-button {
   transition: background 0.15s;
 }
 .secondary-btn:hover { background: rgba(0,113,227,0.07); }
+
+/* =========================
+   Context Input Section
+   ========================= */
+.context-input-section {
+  max-width: 860px;
+  margin: 0 auto 1.5rem;
+  padding: 1.5rem 1.75rem;
+  background: var(--glass-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-soft);
+}
+
+.context-input-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.context-input-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.context-icon { margin-right: 0.3rem; }
+
+.context-title-en {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.context-input-hint {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.context-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .context-grid { grid-template-columns: 1fr; }
+}
+
+.context-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  transition: border-color 0.2s;
+}
+
+.context-card:focus-within {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(0,113,227,0.08);
+}
+
+.context-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.context-card-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+.context-card-label {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.context-card-label-en {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.context-card-dims {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--blue);
+  background: rgba(0,113,227,0.08);
+  padding: 2px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.context-textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.82rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.2s;
+  min-height: 72px;
+}
+
+.context-textarea:focus {
+  border-color: var(--blue);
+  background: var(--surface);
+}
+
+.context-textarea::placeholder {
+  color: #b0b0b8;
+  font-size: 0.78rem;
+}

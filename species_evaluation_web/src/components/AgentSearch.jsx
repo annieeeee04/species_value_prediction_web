@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function AgentSearch({ onScoresApplied, apiBase }) {
+export default function AgentSearch({ onScoresApplied, apiBase, context }) {
   const [speciesName, setSpeciesName] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -16,7 +16,13 @@ export default function AgentSearch({ onScoresApplied, apiBase }) {
       const res = await fetch(`${apiBase}/agent-search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ species_name: speciesName.trim() }),
+        body: JSON.stringify({
+          species_name: speciesName.trim(),
+          context_market: context?.market || "",
+          context_production: context?.production || "",
+          context_cultural: context?.cultural || "",
+          context_regulatory: context?.regulatory || "",
+        }),
       });
 
       const text = await res.text();
