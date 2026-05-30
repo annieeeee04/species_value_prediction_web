@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import Header from "./components/Header";
 import EvaluationPage from "./components/EvaluationPage";
 import ImageAnalysis from "./components/ImageAnalysis";
+import AgentSearch from "./components/AgentSearch";
 import { FIELDS } from "./constants/fields";
 
 const INITIAL_INPUTS = Object.fromEntries(
@@ -117,6 +118,12 @@ export default function App() {
   return (
     <div>
       <Header />
+
+      {/* Agent online search section */}
+      <AgentSearch
+        onScoresApplied={handleAiScores}
+        apiBase={API_BASE}
+      />
 
       {/* Multimodal image analysis section */}
       <ImageAnalysis

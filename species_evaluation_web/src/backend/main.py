@@ -10,9 +10,11 @@ import anthropic
 
 from db import SessionLocal, engine, Base
 from models import PredictionRecord
+from agent import router as agent_router
 
 Base.metadata.create_all(bind=engine)
 app = FastAPI()
+app.include_router(agent_router)
 
 # Allow React dev server
 app.add_middleware(
